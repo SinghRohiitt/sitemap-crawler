@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectMongo } from "../config/mongo.js";
+import { crawlQueue } from "../queue/crawl.queue.js";
 
 dotenv.config();
 
@@ -14,6 +15,10 @@ app.get("/", (req, res) => {
   res.send("🚀 Sitemap Crawler API is running");
 });
 
+app.get("/test-queue", async (req, res) => {
+  await crawlQueue.add("test-job", { msg: "hello from upstash" });
+  res.send("✅ Job added to Upstash queue");
+});
 // start server AFTER mongo connects
 const startServer = async () => {
   await connectMongo();
