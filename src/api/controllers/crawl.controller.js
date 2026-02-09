@@ -37,30 +37,33 @@ export const crawlSitemap = async (req, res) => {
     // 🔥 4️⃣ background enqueue (NON-BLOCKING)
     setImmediate(async () => {
       for (const url of urls) {
-        try {
-          await Page.findOneAndUpdate(
-            { url },
-            { url, crawlStatus: "pending" },
-            { upsert: true },
-          );
+        const page = await Page.findOne({ url });
 
-          const jobId = getJobId(url);
-
-          await crawlQueue.add(
-            "crawl-page",
-            { url },
-            {
-              jobId,
-              attempts: 3,
-              backoff: {
-                type: "exponential",
-                delay: 5000,
-              },
-            },
-          );
-        } catch (err) {
-          console.error("enqueue failed for:", url);
+        // ✅ GUARD: already success page ko skip karo
+        if (page && page.crawlStatus === "success") {
+          continue;
         }
+
+        await Page.findOneAndUpdate(
+          { url },
+          { url, crawlStatus: "pending" },
+          { upsert: true },
+        );
+
+        const jobId = getJobId(url);
+
+        await crawlQueue.add(
+          "crawl-page",
+          { url },
+          {
+            jobId,
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 5000,
+            },
+          },
+        );
       }
     });
   } catch (error) {
