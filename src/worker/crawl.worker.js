@@ -4,6 +4,7 @@ import * as cheerio from "cheerio";
 import Page from "../models/Page.model.js";
 import { redisConnection } from "../config/redis.js";
 import { connectMongo } from "../config/mongo.js";
+import { buildIncomingLinks } from "./buildIncomingLinks.js";
 
 // Mongo connect (worker ke liye alag process)
 await connectMongo();
@@ -16,7 +17,7 @@ const normalizeUrl = (url) => {
 };
 
 // 🔹 Worker
-new Worker(
+const worker = new Worker(
   "crawl-queue",
   async (job) => {
     const { url } = job.data;
@@ -83,7 +84,7 @@ new Worker(
         },
       );
 
-        console.log("✅ Crawled:", pageUrl);
+      console.log("✅ Crawled:", pageUrl);
     } catch (error) {
       // Update failure info
       await Page.findOneAndUpdate(
@@ -105,3 +106,7 @@ new Worker(
     concurrency: 5, // ek saath kitne pages crawl hon
   },
 );
+worker.on("drained", async () => {
+  console.log("📭 Queue drained");
+  await buildIncomingLinks();
+});

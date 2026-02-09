@@ -1,8 +1,7 @@
 import Page from "../../models/Page.model.js";
 
 // 🔹 helper: normalize URL
-const normalizeUrl = (url) =>
-  url.trim().replace(/\/$/, "").toLowerCase();
+const normalizeUrl = (url) => url.trim().replace(/\/$/, "").toLowerCase();
 
 /**
  * POST /pages/incoming
@@ -72,9 +71,9 @@ export const getOutgoingLinks = async (req, res) => {
  */
 export const getTopLinkedPages = async (req, res) => {
   try {
-    const { n } = req.body;
+    const { n = 5 } = req.body || {}; // 👈 SAFE FIX
 
-    const limit = Number(n) || 5;
+    const limit = Number(n);
 
     const pages = await Page.find({ crawlStatus: "success" })
       .sort({ incomingCount: -1 })
