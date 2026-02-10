@@ -84,7 +84,7 @@ const worker = new Worker(
         },
       );
 
-      console.log("✅ Crawled:", pageUrl);
+    //   console.log("✅ Crawled:", pageUrl);
     } catch (error) {
       // Update failure info
       await Page.findOneAndUpdate(
