@@ -1,7 +1,7 @@
 import Page from "../models/Page.model.js";
 
 export const buildIncomingLinks = async () => {
-  console.log("🔄 Building incoming links...");
+  // console.log("🔄 Building incoming links...");
 
   const pages = await Page.find({}, { url: 1, outgoingLinks: 1 });
 

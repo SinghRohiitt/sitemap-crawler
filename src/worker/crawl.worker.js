@@ -9,7 +9,7 @@ import { buildIncomingLinks } from "./buildIncomingLinks.js";
 // Mongo connect (worker ke liye alag process)
 await connectMongo();
 
-console.log("👷 Crawl Worker started");
+// console.log("👷 Crawl Worker started");
 
 // 🔹 URL normalize helper
 const normalizeUrl = (url) => {
@@ -97,13 +97,13 @@ const worker = new Worker(
         },
       );
 
-      console.log("❌ Failed:", pageUrl);
-      throw error; // IMPORTANT → BullMQ retry karega
+      console.log(" Failed:", pageUrl);
+      throw error; 
     }
   },
   {
     connection: redisConnection,
-    concurrency: 5, // ek saath kitne pages crawl hon
+    concurrency: 5, 
   },
 );
 worker.on("drained", async () => {
